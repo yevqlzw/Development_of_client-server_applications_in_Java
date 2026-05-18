@@ -4,8 +4,13 @@ public class Encoder {
 
     public byte[] encode(Package pack) {
         Message message = pack.getMessage();
-        byte[] messageBytes = message.getMessage().getBytes();
-        int messageDataLength = 4 + 4 + messageBytes.length;
+        byte[] encryptedMessage;
+        try {
+            encryptedMessage = MyCipher.encrypt(message.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Encryption failed", e);
+        }
+        int messageDataLength = 4 + 4 + encryptedMessage.length;
 
         ByteBuffer buffer = ByteBuffer.allocate(1 + 1 + 8 + 4 + 2 + messageDataLength + 2);
 
@@ -19,7 +24,7 @@ public class Encoder {
         int messageStart = buffer.position();
         buffer.putInt(message.getcType());
         buffer.putInt(message.getbUserId());
-        buffer.put(messageBytes);
+        buffer.put(encryptedMessage);
 
         buffer.putShort(Crc16.calculateCrc(buffer.array(), messageStart, messageDataLength));
 

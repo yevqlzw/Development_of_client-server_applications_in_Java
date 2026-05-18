@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Message {
     private int cType;
     private int bUserId;
@@ -32,6 +34,22 @@ public class Message {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Message message = (Message) o;
+        return cType == message.cType &&
+                bUserId == message.bUserId &&
+                Objects.equals(this.message, message.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cType, bUserId, message);
     }
 }
 

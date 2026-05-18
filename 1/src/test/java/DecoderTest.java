@@ -1,24 +1,62 @@
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DecoderTest {
+
     @Test
-    void testDecode() throws DecoderException {
+    void testDecode() throws Exception {
+        MyCipher.setTestKey();
+
+        Package original = new Package((byte) 1, 2L, new Message(3, 4, "test"));
+
+        Encoder encoder = new Encoder();
+        byte[] encoded = encoder.encode(original);
 
         Decoder decoder = new Decoder();
-        String encodedHex = "130100000000000000020000000c9769000000030000000474657374c8cb";
+        Package decoded = decoder.decode(encoded);
 
-        byte [] expectedBytes = Hex.decodeHex(encodedHex);
+        assertEquals((byte) 1, decoded.getbSrc());
+        assertEquals(2L, decoded.getbPktId());
+        assertEquals(3, decoded.getMessage().getcType());
+        assertEquals(4, decoded.getMessage().getbUserId());
+        assertEquals("test", decoded.getMessage().getMessage());
 
-        Package pack = decoder.decode(expectedBytes);
+        System.out.println("DecoderTest: Successful decode passed");
+    }
 
-        assertEquals(pack.getbSrc(), (byte)1);
-        assertEquals(pack.getbPktId(), 2);
-        assertEquals(pack.getMessage().getcType(), 3);
-        assertEquals(pack.getMessage().getbUserId(), 4);
-        assertEquals(pack.getMessage().getMessage(), "test");
+    @Test
+    void testDecodeInvalidHeaderCrc() {
+        MyCipher.setTestKey();
+
+        Package original = new Package((byte) 1, 2L, new Message(3, 4, "test"));
+        Encoder encoder = new Encoder();
+        byte[] data = encoder.encode(original);
+
+        data[14] = (byte) (data[14] ^ 0xFF);
+
+        Decoder decoder = new Decoder();
+
+        assertThrows(RuntimeException.class,
+                () -> decoder.decode(data),
+                "Should throw exception on invalid header CRC");
+    }
+
+    @Test
+    void testDecodeInvalidMessageCrc() {
+        MyCipher.setTestKey();
+
+        Package original = new Package((byte) 1, 2L, new Message(3, 4, "test"));
+        Encoder encoder = new Encoder();
+        byte[] data = encoder.encode(original);
+
+        int lastIndex = data.length - 1;
+        data[lastIndex] = (byte) (data[lastIndex] ^ 0xFF);
+
+        Decoder decoder = new Decoder();
+
+        assertThrows(RuntimeException.class,
+                () -> decoder.decode(data),
+                "Should throw exception on invalid message CRC");
     }
 }

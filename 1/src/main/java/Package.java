@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Package {
     private byte bSrc;
     private long bPktId;
@@ -34,5 +36,21 @@ public class Package {
 
     public void setMessage(Message message) {
         this.message = message;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Package aPackage = (Package) o;
+        return bSrc == aPackage.bSrc &&
+                bPktId == aPackage.bPktId &&
+                Objects.equals(message, aPackage.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bSrc, bPktId, message);
     }
 }

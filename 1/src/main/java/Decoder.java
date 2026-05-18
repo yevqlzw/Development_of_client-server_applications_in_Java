@@ -4,8 +4,10 @@ public class Decoder {
     public Package decode (byte[] data) {
        Package pack = new Package();
             ByteBuffer bytes = ByteBuffer.wrap(data);
-            bytes.get();
-
+            byte magic = bytes.get();
+            if (magic != 0x13) {
+            throw new RuntimeException("Invalid magic byte: " + magic);
+            }
             pack.setbSrc(bytes.get());
             pack.setbPktId(bytes.getLong());
 
@@ -18,16 +20,25 @@ public class Decoder {
 
             int cType = bytes.getInt();
             int bUserId = bytes.getInt();
-            int textLength = messageLength-4-4;
 
-            pack.setMessage(new Message(cType, bUserId, new String(bytes.array(), 24, textLength)));
-            bytes.position(24+textLength);
+            int encryptedTextLength = messageLength-4-4;
+            byte[] encryptedText = new byte[encryptedTextLength];
+            bytes.get(encryptedText);
+
+            String decryptedText;
+        try {
+            decryptedText = MyCipher.decrypt(encryptedText);
+        } catch (Exception e) {
+            throw new RuntimeException("Decryption failed", e);
+        }
+
+        pack.setMessage(new Message(cType, bUserId, decryptedText));
 
 
-            short message_crc16 = Crc16.calculateCrc(data, 16, messageLength);
-            if (message_crc16 != bytes.getShort()) {
-                throw new RuntimeException("Invalid Message CRC16!");
-            }
-            return pack;
+        short message_crc16 = Crc16.calculateCrc(data, 16, messageLength);
+        if (message_crc16 != bytes.getShort()) {
+            throw new RuntimeException("Invalid Message CRC16!");
+        }
+        return pack;
     }
 }
