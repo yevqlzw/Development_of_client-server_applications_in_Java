@@ -1,3 +1,8 @@
+import protocol.Decoder;
+import protocol.Encoder;
+import protocol.Message;
+import protocol.MyCipher;
+import protocol.Package;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,13 +13,13 @@ class DecoderTest {
     void testDecode() throws Exception {
         MyCipher.setTestKey();
 
-        Package original = new Package((byte) 1, 2L, new Message(3, 4, "test"));
+        protocol.Package original = new protocol.Package((byte) 1, 2L, new Message(3, 4, "test"));
 
         Encoder encoder = new Encoder();
         byte[] encoded = encoder.encode(original);
 
         Decoder decoder = new Decoder();
-        Package decoded = decoder.decode(encoded);
+        protocol.Package decoded = decoder.decode(encoded);
 
         assertEquals((byte) 1, decoded.getbSrc());
         assertEquals(2L, decoded.getbPktId());
@@ -29,7 +34,7 @@ class DecoderTest {
     void testDecodeInvalidHeaderCrc() {
         MyCipher.setTestKey();
 
-        Package original = new Package((byte) 1, 2L, new Message(3, 4, "test"));
+        protocol.Package original = new protocol.Package((byte) 1, 2L, new Message(3, 4, "test"));
         Encoder encoder = new Encoder();
         byte[] data = encoder.encode(original);
 
@@ -46,7 +51,7 @@ class DecoderTest {
     void testDecodeInvalidMessageCrc() {
         MyCipher.setTestKey();
 
-        Package original = new Package((byte) 1, 2L, new Message(3, 4, "test"));
+        Package original = new protocol.Package((byte) 1, 2L, new Message(3, 4, "test"));
         Encoder encoder = new Encoder();
         byte[] data = encoder.encode(original);
 

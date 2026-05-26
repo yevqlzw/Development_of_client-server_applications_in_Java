@@ -1,3 +1,4 @@
+import protocol.MyCipher;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Test;
 

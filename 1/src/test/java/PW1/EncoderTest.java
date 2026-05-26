@@ -1,3 +1,7 @@
+import protocol.Encoder;
+import protocol.Message;
+import protocol.MyCipher;
+import protocol.Package;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,7 +12,7 @@ class EncoderTest {
     void testEncode() {
         MyCipher.setTestKey();
 
-        Package pack = new Package((byte) 1, 2, new Message(3, 4, "test"));
+        Package pack = new protocol.Package((byte) 1, 2, new Message(3, 4, "test"));
         Encoder encoder = new Encoder();
         byte[] encoded = encoder.encode(pack);
 
@@ -23,6 +27,6 @@ class EncoderTest {
         assertEquals(0, encoded[6]);
         assertEquals(0, encoded[7]);
 
-        System.out.println("EncoderTest passed. Package length: " + encoded.length);
+        System.out.println("EncoderTest passed. Protocol.Package length: " + encoded.length);
     }
 }

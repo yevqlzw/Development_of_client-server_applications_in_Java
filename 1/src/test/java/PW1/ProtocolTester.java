@@ -1,3 +1,8 @@
+import protocol.Decoder;
+import protocol.Encoder;
+import protocol.Message;
+import protocol.MyCipher;
+import protocol.Package;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,13 +12,13 @@ class ProtocolTester {
     void testFullProtocol() throws Exception {
         MyCipher.setTestKey();
 
-        Package original = new Package((byte) 1, 2L, new Message(3, 4, "It's a secret message!"));
+        Package original = new protocol.Package((byte) 1, 2L, new Message(3, 4, "It's a secret message!"));
 
         byte[] encoded = new Encoder().encode(original);
         System.out.println("Encoded (hex): " + bytesToHex(encoded));
 
-        Package decoded = new Decoder().decode(encoded);
-        System.out.println("Message: " + decoded.getMessage().getMessage());
+        protocol.Package decoded = new Decoder().decode(encoded);
+        System.out.println("Protocol.Message: " + decoded.getMessage().getMessage());
 
         assertEquals(original, decoded);
         System.out.println("All assertions passed! Protocol works correctly.");
