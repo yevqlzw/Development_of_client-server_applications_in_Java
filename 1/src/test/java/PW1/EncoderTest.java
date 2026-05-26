@@ -1,3 +1,5 @@
+package PW1;
+
 import protocol.Encoder;
 import protocol.Message;
 import protocol.MyCipher;
@@ -27,6 +29,6 @@ class EncoderTest {
         assertEquals(0, encoded[6]);
         assertEquals(0, encoded[7]);
 
-        System.out.println("EncoderTest passed. Protocol.Package length: " + encoded.length);
+        System.out.println("PW1.EncoderTest passed. Protocol.Package length: " + encoded.length);
     }
 }

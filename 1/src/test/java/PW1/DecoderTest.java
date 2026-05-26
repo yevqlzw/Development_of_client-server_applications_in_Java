@@ -1,3 +1,5 @@
+package PW1;
+
 import protocol.Decoder;
 import protocol.Encoder;
 import protocol.Message;
@@ -27,7 +29,7 @@ class DecoderTest {
         assertEquals(4, decoded.getMessage().getbUserId());
         assertEquals("test", decoded.getMessage().getMessage());
 
-        System.out.println("DecoderTest: Successful decode passed");
+        System.out.println("PW1.DecoderTest: Successful decode passed");
     }
 
     @Test
