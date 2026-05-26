@@ -1,3 +1,5 @@
+package protocol;
+
 import javax.crypto.*;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;

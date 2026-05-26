@@ -1,3 +1,5 @@
+package protocol;
+
 import java.nio.ByteBuffer;
 
 public class Encoder {

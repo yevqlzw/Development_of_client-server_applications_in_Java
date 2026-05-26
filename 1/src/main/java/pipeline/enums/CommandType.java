@@ -1,4 +1,4 @@
-package warehouse;
+package pipeline.enums;
 
 public enum CommandType {
     GET_QUANTITY(1),
@@ -24,6 +24,6 @@ public enum CommandType {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown command code: " + code);
+        throw new IllegalArgumentException("Unknown command: " + code);
     }
 }

@@ -1,3 +1,5 @@
+package protocol;
+
 import java.util.Objects;
 
 public class Message {

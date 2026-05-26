@@ -1,4 +1,4 @@
-package pipeline;
+package pipeline.interfaces;
 
 import java.net.InetAddress;
 

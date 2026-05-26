@@ -1,3 +1,5 @@
+package protocol;
+
 import java.nio.ByteBuffer;
 
 public class Decoder {
@@ -37,7 +39,7 @@ public class Decoder {
 
         short message_crc16 = Crc16.calculateCrc(data, 16, messageLength);
         if (message_crc16 != bytes.getShort()) {
-            throw new RuntimeException("Invalid Message CRC16!");
+            throw new RuntimeException("Invalid Protocol.Message CRC16!");
         }
         return pack;
     }

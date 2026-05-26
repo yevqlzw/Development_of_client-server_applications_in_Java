@@ -1,4 +1,4 @@
-package pipeline;
+package pipeline.enums;
 
 public enum ComponentType {
     RECEIVER("Receiver"),
