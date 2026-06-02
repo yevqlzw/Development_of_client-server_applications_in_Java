@@ -2,9 +2,10 @@ package HW2;
 
 import org.junit.jupiter.api.Test;
 import pipeline.*;
+import pipeline.fake_implementation.FakeReceiver;
+import pipeline.fake_implementation.FakeSender;
 import pipeline.enums.ComponentType;
 import protocol.*;
-import protocol.Package;
 import warehouse.Warehouse;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,9 +17,10 @@ public class MultiReceiverTest {
     void testMultipleReceivers() throws InterruptedException {
         MyCipher.setTestKey();
 
-        BlockingQueue<byte[]> q1 = new LinkedBlockingQueue<>();
-        BlockingQueue<Package> q2 = new LinkedBlockingQueue<>();
-        BlockingQueue<Package> q3 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientBytes> q1 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientPackage> q2 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientPackage> q3 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientBytes> q4 = new LinkedBlockingQueue<>(); // для зашифрованих відповідей
         AtomicBoolean running = new AtomicBoolean(true);
 
         Warehouse warehouse = new Warehouse();
@@ -45,6 +47,14 @@ public class MultiReceiverTest {
             new Thread(new Processor(q2, q3, running, warehouse, ComponentType.PROCESSOR, i + 1)).start();
         }
 
+        for (int i = 0; i < 2; i++) {
+            new Thread(new Encryptor(q3, q4, running, ComponentType.ENCRYPTOR, i + 1)).start();
+        }
+
+        for (int i = 0; i < 2; i++) {
+            new Thread(new FakeSender(q4, running, ComponentType.SENDER, i + 1)).start();
+        }
+
         Thread.sleep(4000);
         running.set(false);
         Thread.sleep(500);
@@ -56,5 +66,6 @@ public class MultiReceiverTest {
         System.out.println("Socks: " + warehouse.getQuantity(21));
         System.out.println("Responses: " + q3.size());
 
-        assertFalse(q3.isEmpty());    }
+        assertFalse(q3.isEmpty());
+    }
 }

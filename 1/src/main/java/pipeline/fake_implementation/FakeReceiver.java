@@ -1,5 +1,6 @@
-package pipeline;
+package pipeline.fake_implementation;
 
+import pipeline.ClientBytes;
 import pipeline.enums.CommandType;
 import pipeline.enums.ComponentType;
 import pipeline.interfaces.ReceiverInterface;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FakeReceiver implements ReceiverInterface, Runnable {
-    private final BlockingQueue<byte[]> inputQueue;
+    private final BlockingQueue<ClientBytes> inputQueue;
     private final AtomicBoolean isRunning;
     private final Random random = new Random();
     private final String name;
@@ -24,7 +25,7 @@ public class FakeReceiver implements ReceiverInterface, Runnable {
     private static final String[] NAMES = {"Shirt", "Jeans", "Jacket", "Socks"};
     private static final int[] GROUPS = {1, 2};
 
-    public FakeReceiver(BlockingQueue<byte[]> inputQueue, AtomicBoolean isRunning, ComponentType type, int id) {
+    public FakeReceiver(BlockingQueue<ClientBytes> inputQueue, AtomicBoolean isRunning, ComponentType type, int id) {
         this.inputQueue = inputQueue;
         this.isRunning = isRunning;
         this.name = type.getName(id);
@@ -96,7 +97,7 @@ public class FakeReceiver implements ReceiverInterface, Runnable {
 
         Encoder encoder = new Encoder();
         try {
-            inputQueue.put(encoder.encode(pack));
+            inputQueue.put(new ClientBytes(encoder.encode(pack), "fake-client"));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

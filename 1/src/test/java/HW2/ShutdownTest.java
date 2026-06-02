@@ -2,9 +2,9 @@ package HW2;
 
 import org.junit.jupiter.api.Test;
 import pipeline.*;
+import pipeline.fake_implementation.FakeReceiver;
 import pipeline.enums.ComponentType;
 import protocol.*;
-import protocol.Package;
 import warehouse.Warehouse;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,9 +16,9 @@ public class ShutdownTest {
     void testAllThreadsStop() throws InterruptedException {
         MyCipher.setTestKey();
 
-        BlockingQueue<byte[]> q1 = new LinkedBlockingQueue<>();
-        BlockingQueue<Package> q2 = new LinkedBlockingQueue<>();
-        BlockingQueue<Package> q3 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientBytes> q1 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientPackage> q2 = new LinkedBlockingQueue<>();
+        BlockingQueue<ClientPackage> q3 = new LinkedBlockingQueue<>();
         AtomicBoolean running = new AtomicBoolean(true);
 
         Warehouse warehouse = new Warehouse();
@@ -31,7 +31,6 @@ public class ShutdownTest {
         for (int i = 0; i < 3; i++) {
             executor.execute(new FakeReceiver(q1, running, ComponentType.RECEIVER, i + 1));
         }
-
         for (int i = 0; i < 2; i++) {
             executor.execute(new Decryptor(q1, q2, running, ComponentType.DECRYPTOR, i + 1));
         }
@@ -40,10 +39,10 @@ public class ShutdownTest {
         }
 
         Thread.sleep(2000);
-
         running.set(false);
         executor.shutdownNow();
 
         boolean stopped = executor.awaitTermination(3, TimeUnit.SECONDS);
-        assertTrue(stopped);    }
+        assertTrue(stopped);
+    }
 }

@@ -1,22 +1,21 @@
 package pipeline;
 
 import pipeline.enums.ComponentType;
-import pipeline.interfaces.DecryptorInterface;
 import protocol.Decoder;
 import protocol.Package;
-
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Decryptor implements DecryptorInterface, Runnable {
-    private final BlockingQueue<byte[]> inputQueue;
-    private final BlockingQueue<Package> outputQueue;
+public class Decryptor implements Runnable {
+    private final BlockingQueue<ClientBytes> inputQueue;
+    private final BlockingQueue<ClientPackage> outputQueue;
     private final AtomicBoolean running;
     private final Decoder decoder = new Decoder();
     private final String name;
 
-    public Decryptor(BlockingQueue<byte[]> inputQueue,
-                     BlockingQueue<Package> outputQueue,
+    public Decryptor(BlockingQueue<ClientBytes> inputQueue,
+                     BlockingQueue<ClientPackage> outputQueue,
                      AtomicBoolean running,
                      ComponentType type, int id) {
         this.inputQueue = inputQueue;
@@ -26,27 +25,19 @@ public class Decryptor implements DecryptorInterface, Runnable {
     }
 
     @Override
-    public void decrypt(byte[] message) {
-        try {
-            Package pack = decoder.decode(message);
-            outputQueue.put(pack);
-            System.out.println("[" + name + "] Decrypted");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            System.err.println("[" + name + "] Error: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void run() {
         while (running.get() && !Thread.currentThread().isInterrupted()) {
             try {
-                byte[] message = inputQueue.take();
-                decrypt(message);
+                ClientBytes cab = inputQueue.poll(200, TimeUnit.MILLISECONDS);
+                if (cab == null) continue;
+                Package pkg = decoder.decode(cab.getData());
+                outputQueue.put(new ClientPackage(pkg, cab.getClientId()));
+                System.out.println("[" + name + "] Decrypted");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
+            } catch (Exception e) {
+                System.err.println("[" + name + "] Error: " + e.getMessage());
             }
         }
     }
