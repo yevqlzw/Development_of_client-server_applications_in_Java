@@ -6,7 +6,12 @@ public enum CommandType {
     DEPOSIT(3),
     ADD_GROUP(4),
     ADD_PRODUCT(5),
-    SET_PRICE(6);
+    SET_PRICE(6),
+    DELETE_PRODUCT(7),
+    UPDATE_PRODUCT(8),
+    SEARCH_PRODUCTS(9),
+    GET_PRODUCT(10),
+    CREATE_PRODUCT(11);
 
     private final int code;
 

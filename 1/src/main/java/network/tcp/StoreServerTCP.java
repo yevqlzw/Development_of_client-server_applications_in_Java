@@ -5,7 +5,8 @@ import pipeline.*;
 import pipeline.enums.ComponentType;
 import pipeline.tcp.TCPReceiver;
 import pipeline.tcp.TCPSender;
-import warehouse.Warehouse;
+import warehouse.ProductManager;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StoreServerTCP {
     private final int port;
-    private final Warehouse warehouse;
+    private final ProductManager productManager;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private ServerSocket serverSocket;
     private ExecutorService executor;
@@ -25,20 +26,25 @@ public class StoreServerTCP {
 
     public StoreServerTCP(int port) {
         this.port = port;
-        this.warehouse = new Warehouse();
+        this.productManager = new ProductManager();
         initWarehouse();
     }
 
     private void initWarehouse() {
-        warehouse.createGroup(1); warehouse.createGroup(2);
-        warehouse.addProductNameToGroup(1, 10, "Shirt");
-        warehouse.addProductNameToGroup(1, 11, "Jeans");
-        warehouse.addProductNameToGroup(2, 20, "Jacket");
-        warehouse.addProductNameToGroup(2, 21, "Socks");
-        warehouse.addQuantity(10, 100); warehouse.addQuantity(11, 200);
-        warehouse.addQuantity(20, 500); warehouse.addQuantity(21, 300);
-        warehouse.setPrice(10, 45.50); warehouse.setPrice(11, 30.00);
-        warehouse.setPrice(20, 15.00); warehouse.setPrice(21, 35.00);
+        productManager.createGroup(1);
+        productManager.createGroup(2);
+        productManager.addProductToGroup(1, 10, "Shirt");
+        productManager.addProductToGroup(1, 11, "Jeans");
+        productManager.addProductToGroup(2, 20, "Jacket");
+        productManager.addProductToGroup(2, 21, "Socks");
+        productManager.addQuantity(10, 100);
+        productManager.addQuantity(11, 200);
+        productManager.addQuantity(20, 500);
+        productManager.addQuantity(21, 300);
+        productManager.setPrice(10, 45.50);
+        productManager.setPrice(11, 30.00);
+        productManager.setPrice(20, 15.00);
+        productManager.setPrice(21, 35.00);
     }
 
     public void start() throws IOException {
@@ -46,7 +52,7 @@ public class StoreServerTCP {
         executor = Executors.newFixedThreadPool(20);
 
         for (int i = 0; i < 2; i++) executor.submit(new Decryptor(rawQueue, decryptQueue, running, ComponentType.DECRYPTOR, i+1));
-        for (int i = 0; i < 4; i++) executor.submit(new Processor(decryptQueue, processQueue, running, warehouse, ComponentType.PROCESSOR, i+1));
+        for (int i = 0; i < 4; i++) executor.submit(new Processor(decryptQueue, processQueue, running, productManager, ComponentType.PROCESSOR, i+1));
         for (int i = 0; i < 2; i++) executor.submit(new Encryptor(processQueue, encryptQueue, running, ComponentType.ENCRYPTOR, i+1));
         TCPSender sender = new TCPSender(encryptQueue, running);
         for (int i = 0; i < 2; i++) executor.submit(sender);
@@ -74,7 +80,7 @@ public class StoreServerTCP {
     public static void main(String[] args) throws Exception {
         StoreServerTCP server = new StoreServerTCP(Utils.TCP_PORT);
         server.start();
-        Thread.sleep(60000);
+        Thread.sleep(40000);
         server.stop();
     }
 }
