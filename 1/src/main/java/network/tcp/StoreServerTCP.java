@@ -1,11 +1,15 @@
 package network.tcp;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import database.ProductDbService;
 import network.Utils;
 import pipeline.*;
 import pipeline.enums.ComponentType;
 import pipeline.tcp.TCPReceiver;
 import pipeline.tcp.TCPSender;
-import warehouse.ProductManager;
+import warehouse.ProductService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StoreServerTCP {
     private final int port;
-    private final ProductManager productManager;
+    private final ProductService productManager;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private ServerSocket serverSocket;
     private ExecutorService executor;
@@ -26,25 +30,27 @@ public class StoreServerTCP {
 
     public StoreServerTCP(int port) {
         this.port = port;
-        this.productManager = new ProductManager();
+        this.productManager = new ProductDbService();
         initWarehouse();
     }
 
     private void initWarehouse() {
-        productManager.createGroup(1);
-        productManager.createGroup(2);
-        productManager.addProductToGroup(1, 10, "Shirt");
-        productManager.addProductToGroup(1, 11, "Jeans");
-        productManager.addProductToGroup(2, 20, "Jacket");
-        productManager.addProductToGroup(2, 21, "Socks");
-        productManager.addQuantity(10, 100);
-        productManager.addQuantity(11, 200);
-        productManager.addQuantity(20, 500);
-        productManager.addQuantity(21, 300);
-        productManager.setPrice(10, 45.50);
-        productManager.setPrice(11, 30.00);
-        productManager.setPrice(20, 15.00);
-        productManager.setPrice(21, 35.00);
+        if (!productManager.groupExists(1)) {
+            productManager.createGroup(1);
+            productManager.createGroup(2);
+            productManager.addProductToGroup(1, 10, "Shirt");
+            productManager.addProductToGroup(1, 11, "Jeans");
+            productManager.addProductToGroup(2, 20, "Jacket");
+            productManager.addProductToGroup(2, 21, "Socks");
+            productManager.addQuantity(10, 100);
+            productManager.addQuantity(11, 200);
+            productManager.addQuantity(20, 500);
+            productManager.addQuantity(21, 300);
+            productManager.setPrice(10, 45.50);
+            productManager.setPrice(11, 30.00);
+            productManager.setPrice(20, 15.00);
+            productManager.setPrice(21, 35.00);
+        }
     }
 
     public void start() throws IOException {

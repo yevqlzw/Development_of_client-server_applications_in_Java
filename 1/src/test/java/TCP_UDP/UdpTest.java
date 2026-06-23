@@ -1,5 +1,8 @@
 package TCP_UDP;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import network.Utils;
 import network.udp.StoreClientUDP;
 import network.udp.StoreServerUDP;
@@ -19,6 +22,7 @@ public class UdpTest {
 
     @BeforeAll
     void startServer() throws Exception {
+        Files.deleteIfExists(Paths.get("warehouse.db"));
         MyCipher.setTestKey();
         server = new StoreServerUDP(Utils.UDP_PORT);
         serverExecutor = Executors.newSingleThreadExecutor();

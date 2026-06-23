@@ -7,6 +7,8 @@ import org.junit.jupiter.api.*;
 import pipeline.enums.CommandType;
 import protocol.MyCipher;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +21,7 @@ public class TcpTest {
 
     @BeforeAll
     void startServer() throws Exception {
+        Files.deleteIfExists(Paths.get("warehouse.db"));
         MyCipher.setTestKey();
         server = new StoreServerTCP(Utils.TCP_PORT);
         serverExecutor = Executors.newSingleThreadExecutor();
